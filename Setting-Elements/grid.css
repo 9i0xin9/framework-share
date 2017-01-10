@@ -1,0 +1,186 @@
+/*** GRID SETTINGS ***/
+.row {
+  overflow: hidden;
+  word-break: break-all;
+  display: flex;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+}
+
+.row div {
+  overflow: inherit;
+  display: inherit;
+  flex-direction: row;
+  flex-wrap: wrap;
+  align-items: stretch;
+  justify-content: center;
+  flex: 1 1 0%;
+  width: auto;
+  max-width: auto;
+}
+
+.row div > * {
+  align-items: center;
+}
+
+/***  DIMENSION SECTION  ***/
+.row .r-1 {
+  flex: 1 1 0;
+}
+
+.row .r-2 {
+  flex: 2 1 0;
+}
+
+.row .r-3 {
+  flex: 3 1 0;
+}
+
+.row .r-4 {
+  flex: 4 1 0;
+}
+
+.row .r-5 {
+  flex: 5 1 0;
+}
+
+.row .r-6 {
+  flex: 6 1 0;
+}
+
+.full div,
+.row .full {
+  flex: 0 0 100%;
+  width: 100%;
+}
+
+.fit div,
+.row .fit {
+  flex: 0 0 auto;
+  width: auto;
+}
+
+@media screen and (max-width: 599px) {
+  .row .xs-1 {
+    flex: 1 1 0;
+  }
+  .row .xs-2 {
+    flex: 2 1 0;
+  }
+  .row .xs-3 {
+    flex: 3 1 0;
+  }
+  .row .xs-4 {
+    flex: 4 1 0;
+  }
+  .row .xs-5 {
+    flex: 5 1 0;
+  }
+  .row .xs-6 {
+    flex: 6 1 0;
+  }
+  .xs-full div,
+  .row .sm-full {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  .xs-fit div,
+  .row .sm-fit {
+    flex: 0 0 auto;
+    width: auto;
+  }
+}
+
+@media screen and (min-width: 600px) and (max-width: 899px) {
+  .row .sm-1 {
+    flex: 1 1 0;
+  }
+  .row .sm-2 {
+    flex: 2 1 0;
+  }
+  .row .sm-3 {
+    flex: 3 1 0;
+  }
+  .row .sm-4 {
+    flex: 4 1 0;
+  }
+  .row .sm-5 {
+    flex: 5 1 0;
+  }
+  .row .sm-6 {
+    flex: 6 1 0;
+  }
+  .sm-full div,
+  .row .sm-full {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  .sm-fit div,
+  .row .sm-fit {
+    flex: 0 0 auto;
+    width: auto;
+  }
+}
+
+@media screen and (min-width: 900px) and (max-width: 1199px) {
+  .row .md-1 {
+    flex: 1 1 0;
+  }
+  .row .md-2 {
+    flex: 2 1 0;
+  }
+  .row .md-3 {
+    flex: 3 1 0;
+  }
+  .row .md-4 {
+    flex: 4 1 0;
+  }
+  .row .md-5 {
+    flex: 5 1 0;
+  }
+  .row .md-6 {
+    flex: 6 1 0;
+  }
+  .md-full div,
+  .row .md-full {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  .md-fit div,
+  .row .md-fit {
+    flex: 0 0 auto;
+    width: auto;
+  }
+}
+
+@media screen and (min-width: 1200px) {
+  .row .lg-1 {
+    flex: 1 1 0;
+  }
+  .row .lg-2 {
+    flex: 2 1 0;
+  }
+  .row .lg-3 {
+    flex: 3 1 0;
+  }
+  .row .lg-4 {
+    flex: 4 1 0;
+  }
+  .row .lg-5 {
+    flex: 5 1 0;
+  }
+  .row .lg-6 {
+    flex: 6 1 0;
+  }
+  .lg-full div,
+  .row .lg-full {
+    flex: 0 0 100%;
+    width: 100%;
+  }
+  .lg-fit div,
+  .row .lg-fit {
+    flex: 0 0 auto;
+    width: auto;
+  }
+}
