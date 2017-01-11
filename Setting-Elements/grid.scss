@@ -78,7 +78,7 @@
                }
            }
            }
-           @if $n == nth($media-queries-list, length($media-queries-list)) {
+           @if $n == $media-queries-last {
                 @media screen and (min-width: nth($media-queries-last, 2)){
                    @for $i from 1 through 6 {
                        .row .#{nth($n, 1)}-#{$i} {
@@ -97,7 +97,7 @@
                    }
                }
            }
-           @else if {
+           @else if $n != $media-queries-last {
                 $media-queries-next: nth($media-queries-list, index($media-queries-list,$n)+1);
                 @media screen and (min-width: nth($n, 2)) and (max-width: nth($media-queries-next, 2)-1px){
                    @for $i from 1 through 6 {
