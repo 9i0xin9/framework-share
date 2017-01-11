@@ -81,12 +81,12 @@
     flex: 6 1 0;
   }
   .xs-full div,
-  .row .sm-full {
+  .row .xs-full {
     flex: 0 0 100%;
     width: 100%;
   }
   .xs-fit div,
-  .row .sm-fit {
+  .row .xs-fit {
     flex: 0 0 auto;
     width: auto;
   }
