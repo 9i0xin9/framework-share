@@ -1,0 +1,10 @@
+* text=auto eol=lf
+
+# If for some reason you want line endings to be CRLF in a specific file type, use example below:
+# *.extension text eol=crlf
+
+*.psd filter=lfs diff=lfs merge=lfs -text
+*.ai filter=lfs diff=lfs merge=lfs -text
+*.jpeg binary
+*.jpg binary
+*.png binary

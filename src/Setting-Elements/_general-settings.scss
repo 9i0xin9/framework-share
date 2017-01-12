@@ -1,0 +1,16 @@
+// this file must contain the list of each setting-element and element that compose my framework which @import all separate element-files, check this file for dependances, if a match is found then it will compile that reference style, otherwise it will exclude a non-match element from final compilation
+// try to analyze the possibility to move into an array (list) to check selected elements, if they are present they will result active for precompilation.
+
+// LIST OF SETTINGS //
+//media-queries
+//fonts
+//colors
+//grid
+
+// set breakpoints, they will be setted automatically into isolated cases (min-max for the internal ones and just max and min for the external)
+// set automatically a first element xs just if at least another one is active in this list.
+$media-queries-list:
+sm 600px,
+md 900px,
+lg 1200px,
+;
