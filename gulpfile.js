@@ -1,9 +1,15 @@
 /**
  * Gulpfile create to make developing this framework easier.
  * Do not touch anything below here unless you know what you're doing.
+ * 
+ * Available CLI commands:
+ * gulp - Run default task: shortcut of `gulp watch`
+ * gulp watch - Run watch task: compiling SASS, starting BrowserSync, watching for file changes
+ * gulp build - Run build task: compiling SASS, concatenates and minifies all css and javascript files, compresses images, moves everything to `dist` folder
+ * gulp autoprefix - Run autoprefix task: autoprefix compiled css in the css folder and sends to the test folder
  *
  * Author: Saborknight
- * Version: 1.0
+ * Version: 1.0.1
  */
 /**
  * User Variables
@@ -13,6 +19,7 @@ confName = 'framework'; // Will be used in url and references
 
 devDir = 'src';
 buildDir = 'dist';
+tempDir = 'tmp';
 
 confSSL = false;
 
@@ -20,10 +27,12 @@ confSSL = false;
  * System Variables
  * Do not touch unless you know what you're doing
  */
+var fs = require('fs');
 var util = require('util');
 var browserSync = require('browser-sync').create(confName);
 var del = require('del');
 var gulp = require('gulp');
+var map = require('map-stream');
 var autoprefixer = require('gulp-autoprefixer');
 var cache = require('gulp-cache');
 var cssnano = require('gulp-cssnano');
@@ -32,7 +41,7 @@ var imagemin = require('gulp-imagemin');
 var plumber = require('gulp-plumber');
 var sass = require('gulp-sass');
 var uglify = require('gulp-uglify');
-var useref = require('gulp-useref');
+var concat = require('gulp-concat');
 var gutil = require('gulp-util');
 var runSequence = require('run-sequence');
 
@@ -54,7 +63,7 @@ gulp.task('build', function(callback) {
 	log('Building!', 'info');
 
 	runSequence('clean:dist',
-		['css', 'useref', 'images'],
+		['css', 'images'],
 		callback);
 });
 
@@ -62,16 +71,47 @@ gulp.task('watch', ['browserSync', 'sass'], function() {
 	gulp.watch(globDeclaration('.scss', 'sass'), ['sass'])
 	gulp.watch(globDeclaration('.html'), browserSync.reload)
 	gulp.watch(globDeclaration('.js', 'js'), browserSync.reload)
-	gulp.watch(globDeclaration('.php'), browserSync.reload)
 });
 
 gulp.task('sass', function() {
-	sassProcess();
+	var sassDir = globDeclaration('.scss', 'Setting-Elements');
+
+	log('Compiling [sass] from: ' + sassDir, 'info');
+
+	return gulp.src( sassDir )
+		.pipe(sass()) // Using gulp-sass
+		.pipe(gulp.dest(devDir + '/css'))
+		.pipe(browserSync.reload({
+			stream: true
+		}));
 });
 
 gulp.task('css', function() {
-	sassProcess();
-	autoprefix();
+	runSequence('sass', 'autoprefix:temp', 'concat:css', 'clean:temp');
+});
+
+gulp.task('autoprefix:temp', function() {
+	var dir = tempDir;
+	log('Autoprefixing to: ' + dir, 'info');
+
+	return gulp.src( globDeclaration('.css', 'css') )
+		// .pipe(map(streamLog))
+		.pipe(autoprefixer({
+			browsers: ['> 0%']
+		}))
+		.pipe(gulp.dest( dir === tempDir ? tempDir + '/css' : dir ));
+});
+
+gulp.task('autoprefix:test', function() {
+	var dir = devDir + '/test';
+	log('Autoprefixing to: ' + dir, 'info');
+
+	return gulp.src( globDeclaration('.css', 'css') )
+		// .pipe(map(streamLog))
+		.pipe(autoprefixer({
+			browsers: ['> 0%']
+		}))
+		.pipe(gulp.dest( dir === tempDir ? tempDir + '/css' : dir ));
 });
 
 gulp.task('browserSync', function() {
@@ -83,14 +123,32 @@ gulp.task('browserSync', function() {
 	});
 });
 
-gulp.task('useref', function(){
-		return gulp.src( globDeclaration('.html') )
-			.pipe(useref())
-			// Minifies only if it's a JavaScript file
-			.pipe(gulpIf('*.js', uglify()))
-			// Minifies only if it's a CSS file
-			.pipe(gulpIf('*.css', cssnano()))
-			.pipe(gulp.dest(buildDir))
+gulp.task('concat:css', function(){
+	var dir = globDeclaration('.css', false, tempDir);
+	dir.push( '!' + devDir + '/bin/**/*.*' );
+
+	log('Concatenating from: ' + dir, 'info');
+	return gulp.src( dir )
+		.pipe(concat('framework.min.css'))
+		// Minifies only if it's a JavaScript file
+		.pipe(gulpIf('*.js', uglify()))
+		// Minifies only if it's a CSS file
+		.pipe(gulpIf('*.css', cssnano()))
+		.pipe(gulp.dest(buildDir))
+});
+
+gulp.task('concat:js', function(){
+	var dir = globDeclaration('.js', false, tempDir);
+	dir.push( '!' + devDir + '/bin/**/*.*' );
+
+	log('Concatenating from: ' + dir, 'info');
+	return gulp.src( dir )
+		.pipe(concat('framework.min.js'))
+		// Minifies only if it's a JavaScript file
+		.pipe(gulpIf('*.js', uglify()))
+		// Minifies only if it's a CSS file
+		.pipe(gulpIf('*.css', cssnano()))
+		.pipe(gulp.dest(buildDir))
 });
 
 gulp.task('images', function(){
@@ -106,44 +164,57 @@ gulp.task('clean:dist', function() {
 	return del.sync(buildDir);
 });
 
+gulp.task('clean:temp', function() {
+	if( tempDir !== null /*&& fs.access( tempDir, (err) => {err ? false : true})*/ ) {
+		log('Cleaning directory: ' + tempDir);
+		setTimeout( function() {
+			return del.sync( tempDir );
+		}, 100);
+		// return del.sync(tempDir);
+	} else {
+		log('Nothing in temp to clean', 'info');
+
+		return;
+	}
+});
+
+gulp.task('clean:test', function() {
+	var dir = devDir + '/test';
+
+	// fs.access( devDir, (err) => { log(err ? 'false' : 'true');});
+
+	if( dir !== null /*&& fs.access( dir, (err) => {err ? return false : return true})*/ ) {
+		log('Cleaning directory: ' + dir);
+
+		return del.sync(dir);
+	} else {
+		log('Nothing in temp to clean', 'info');
+
+		return;
+	}
+});
+
 gulp.task('cache:clear', function (callback) {
 	return cache.clearAll(callback);
 });
-
-function sassProcess() {
-	var sassDir = globDeclaration('.scss', 'sass');
-
-	log('Compiling [sass] from: ' + sassDir, 'info');
-
-	return gulp.src( sassDir )
-		.pipe(sass()) // Using gulp-sass
-		.pipe(gulp.dest(devDir + '/css'))
-		.pipe(browserSync.reload({
-			stream: true
-	}));
-}
-
-function autoprefix() {
-	log('Autoprefixing', 'info');
-
-	return gulp.src( globDeclaration('.css', 'css') )
-		.pipe(autoprefixer({
-			browsers: ['> 0%']
-		}))
-		.pipe(gulp.dest(buildDir + '/css'));
-}
 
 /**
  * Utility Functions. Do not touch anything below here unless you know what you're doing
  *
  * Author: Saborknight
- * Version: 1.0
  */
-function globDeclaration(fileType, folder = false) {
-	srcGlob = [util.format('%s/%s**/*%s', devDir, folder ? folder +'/' : '', fileType),
-		util.format('!%s/%s**/*-OLD*%s', devDir, folder ? folder +'/' : '', fileType)];
+function globDeclaration(fileType, folder = false, rootDir = devDir) {
+	srcGlob = [util.format('%s/%s**/*%s', rootDir, folder ? folder +'/' : '', fileType),
+		util.format('!%s/%s**/*-OLD*%s', rootDir, folder ? folder +'/' : '', fileType)];
 
 	return srcGlob;
+}
+
+// This is purely for logs being piped with data
+var streamLog = function(file, callback) {
+	var message = 'Autoprefixing files: ' + file.path;
+	log(message);
+	callback(null, file);
 }
 
 function log(message, state = 'info') {

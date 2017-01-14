@@ -1,7 +1,8 @@
 ######################## Project Specific ########################
 .DS_Store
 node_modules
-src/*.css
+src/**/*.css
+tmp/**/*.*
 
 ####################################################################################################
 ## Windows : https://github.com/github/gitignore/blob/master/Global/Windows.gitignore
