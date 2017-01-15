@@ -5,8 +5,10 @@
  * Available CLI commands:
  * gulp - Run default task: shortcut of `gulp watch`
  * gulp watch - Run watch task: compiling SASS, starting BrowserSync, watching for file changes
- * gulp build - Run build task: compiling SASS, concatenates and minifies all css and javascript files, compresses images, moves everything to `dist` folder
- * gulp autoprefix - Run autoprefix task: autoprefix compiled css in the css folder and sends to the test folder
+ * gulp build - Run build task: compiling SASS, concatenates and minifies all css and javascript files, compresses images, moves everything to `dist` directory
+ * gulp sass - Run sass task: compile SASS
+ * gulp autoprefix:test - Run autoprefix task: autoprefix compiled css in the `css` directory and sends to the `test` directory
+ * gulp concat:css - Run concat:css task: Concatenates and minifies the css files from the `tmp` directory to `dist`
  *
  * Author: Saborknight
  * Version: 1.0.1
@@ -87,10 +89,10 @@ gulp.task('sass', function() {
 });
 
 gulp.task('css', function() {
-	runSequence('sass', 'autoprefix:temp', 'concat:css', 'clean:temp');
+	runSequence('sass', 'autoprefix', 'concat:css', 'clean:temp');
 });
 
-gulp.task('autoprefix:temp', function() {
+gulp.task('autoprefix', function() {
 	var dir = tempDir;
 	log('Autoprefixing to: ' + dir, 'info');
 
