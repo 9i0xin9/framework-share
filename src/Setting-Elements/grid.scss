@@ -1,4 +1,4 @@
-
+   ////   FLEXBOX PROPS   ////
    // display: flex
    // flex-direction: row | row-reverse | column | column-reverse
    // flex-wrap: nowrap | wrap | wrap-reverse
@@ -6,52 +6,128 @@
    // align-items: flex-start | flex-end | center | baseline | stretch
    // justify-content: flex-start | flex-end | center | space-between | space-around
 
+   ////   FLEXBUGS   ////
+   // check here to make sure to cover the most of flexbugs through browsers
+   // https://github.com/philipwalton/flexbugs
+
+   ////   SPECIFICITY REFERENCE   ////
+   // http://codepen.io/9i0xin9/pen/zNqMvP here an idea of the structure concept I've used here
+   // general = .class * | childs = .class > * | element = body .class
+   // Inline styles 1000
+   // ID 100
+   // Classes, attributes, pseudo-classes 10
+   // Elements, pseudo-elements 1
+   // CSS Number Line 0.0001
+   // (* asterisk have 0 weight of specificity)
+
+   ////   INHERIT ITEMS   ////
+   // I will make some properties inherit to make the elements child settable from their parents.
+   // overflow is declare to hiddden using the inherit tecnique, we set it through the parent element and we make it inherit for all connected general elements
+   // display will act in the same way inside the row or column classes.
+   // inherited parameters are setted like this to make a declared class active for all childs elements.
+   // Declare an inherit parameter just if later you will set a class that can control (switch) that parameter.
+
+   // Lets create a well-done and appropriate CSS order rule for our file. Automate it if is possible with some cool custom parser.
+
+   // just assign a span different class *:not(span) to make differents spans text inside the same div to act like an unique word
+
    @import 'general-settings.scss';
 
    /*** GRID SETTINGS ***/
 
-   .row {
-     overflow: hidden;
-     word-break: break-all;
-     display: flex;
-     flex-direction: row;
-     flex-wrap: wrap;
-     align-items: stretch
+   ////   Content Section ( general )  ////
+
+   @mixin flex-items($flex-basis,$flex-justify){
+      overflow: inherit;
+      display: inherit;
+      flex-direction: inherit;
+      flex-wrap: inherit;
+      align-items: inherit;
+      justify-content: $flex-justify;
+      flex: 1 0 $flex-basis;
+      width: auto;
+      max-width: auto; //? not sure that it's necessary
    }
 
-   .row div {
-     overflow: inherit;
-     display: inherit;
-     flex-direction: row;
-     flex-wrap: wrap;
-     align-items: stretch;
-     justify-content: center;
-     flex: 1 1 0%;
-     width: auto;
-     max-width: auto;
+   .row * {
+     @include flex-items(0%,center);
    }
 
-   .row div > * {
+   .column * {
+     @include flex-items(auto,left);   // in accord with the first flexbug point
+   }
+
+
+   ////   Child Section (child)  ////
+
+   .row > * {
      align-items: center;
    }
+
+   .colummn > * {
+    align-items: center;
+   }
+
+
+   ////   Parent Section (element)   ////
+
+   @mixin flex-parent($flex-direction) {
+      overflow: hidden;
+      word-break: break-all;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: stretch;
+      flex-direction: $flex-direction;
+   }
+
+   body .row {
+   @include flex-parent(row);
+   }
+
+   body .column {
+   @include flex-parent(column);
+  }
+
+
+   ////   Exclusion Selection coordinate it with other framework elements in some way   ////   maybe better to follow the specificity rule put on top of Parent Section (element) to make that more important.
+
+   .row span, .column span {
+     flex: 0 0 auto;
+     width: auto;
+   }
+
 
 
    /***  DIMENSION SECTION  ***/
 
+   @mixin flex-item($flex-grow){
+      flex: $flex-grow 0 0%;
+   }
+
+   @mixin full{
+      flex: 0 0 100%;
+      width: 100%;
+   }
+
+   @mixin fit{
+      flex: 0 0 auto;
+      width: auto;
+   }
+
    @for $i from 1 through 6{
-      .row .r-#{$i} {
-          flex: #{$i} 1 0;
+      .row .r-#{$i} {    // in this case isn't necessary to set a childs declaration, cause childs are using the general row settings
+         @include flex-item(#{$i});
       }
    }
-   .full div,
-   .row .full {
-   flex: 0 0 100%;
-   width: 100%;
+   .full *,              // general
+   .full > *,            // childs
+   .row .full {          // elements (parent)
+   @include full;
    }
-   .fit div,
+   .fit *,               
+   .fit > *,
    .row .fit {
-   flex: 0 0 auto;
-   width: auto;
+   @include fit;
    }
 
    @if variable-exists(media-queries-list) {
@@ -63,19 +139,19 @@
            @if $n == nth($media-queries-list,1){
            @media screen and (max-width: nth($media-queries-first, 2)-1px) {
                 @for $i from 1 through 6{
-                   .row .xs-#{$i} {
-                       flex: #{$i} 1 0;
+                   .row .xs-#{$i} {     // in this case isn't necessary to set a childs declaration, cause childs are using the general row settings
+                       @include flex-item(#{$i});
                    }
                }
-               .xs-full div,
+               .xs-full *,
+               .xs-full > *,
                .row .xs-full {
-               flex: 0 0 100%;
-               width: 100%;
+               @include full;
                }
-               .xs-fit div,
+               .xs-fit *,
+               .xs-fit > *,
                .row .xs-fit {
-               flex: 0 0 auto;
-               width: auto;
+               @include fit;
                }
            }
            }
@@ -85,18 +161,18 @@
                 @media screen and (min-width: nth($n, 2)) and (max-width: nth($media-queries-next, 2)-1px){
                    @for $i from 1 through 6 {
                        .row .#{nth($n, 1)}-#{$i} {
-                           flex: #{$i} 1 0;
+                           @include flex-item(#{$i});
                        }
                    }
-                   .#{nth($n, 1)}-full div,
+                   .#{nth($n, 1)}-full *,
+                   .#{nth($n, 1)}-full > *,
                    .row .#{nth($n, 1)}-full {
-                    flex: 0 0 100%;
-                    width: 100%;
+                    @include full;
                    }
-                   .#{nth($n, 1)}-fit div,
+                   .#{nth($n, 1)}-fit *,
+                   .#{nth($n, 1)}-fit > *,
                    .row .#{nth($n, 1)}-fit {
-                    flex: 0 0 auto;
-                    width: auto;
+                    @include fit;
                    }
                }
            }
@@ -105,18 +181,18 @@
                 @media screen and (min-width: nth($media-queries-last, 2)){
                    @for $i from 1 through 6 {
                        .row .#{nth($n, 1)}-#{$i} {
-                           flex: #{$i} 1 0;
+                           @include flex-item(#{$i});
                        }
                    }
-                   .#{nth($n, 1)}-full div,
+                   .#{nth($n, 1)}-full *,
+                   .#{nth($n, 1)}-full > *,
                    .row .#{nth($n, 1)}-full {
-                    flex: 0 0 100%;
-                    width: 100%;
+                    @include full;
                    }
-                   .#{nth($n, 1)}-fit div,
+                   .#{nth($n, 1)}-fit *,
+                   .#{nth($n, 1)}-fit > *,
                    .row .#{nth($n, 1)}-fit {
-                    flex: 0 0 auto;
-                    width: auto;
+                    @include fit;
                    }
                }
            }
